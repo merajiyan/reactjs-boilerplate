@@ -1,6 +1,6 @@
 # reactjs-boilerplate
 
-Basic react setup with babel, webpack with basic loaders, ant design, react-router and optomized for production using code splitting and lazy loading
+Basic react setup with babel, webpack with basic loaders, styled-components, typescript, react-router.
 
 This is similar to `create-react-app` but gives you more control over the build configurations.
 
@@ -17,13 +17,13 @@ npm install -g reactjs-boilerplate
 After installation, use can use the following command to initialize your project.
 
 ```bash
-reactjs-boilerplate project-name
+reacreate project-name
 ```
 
 Alternatively, you can use `npx` to directly use `reactjs-boilerplate` without installing globally.
 
 ```bash
-npx reactjs-boilerplate project-name
+npx reacreate project-name
 ```
 
 ## Usage
