@@ -5,9 +5,9 @@
   "main": "index.tsx",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Nikhil-Kumaran/reactjs-boilerplate/"
+    "url": "https://github.com/merajiyan/reactjs-boilerplate"
   },
-  "homepage": "https://reactjs-boilerplate.netlify.com/",
+  "homepage": "https://github.com/merajiyan/reactjs-boilerplate",
   "keywords": [
     "react-boilerplate",
     "reactjs-boilerplate",
