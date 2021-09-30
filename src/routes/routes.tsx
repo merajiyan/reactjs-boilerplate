@@ -1,4 +1,4 @@
-import HomePage from '../pages/home/Home';
+import HomePage from 'pages/home/Home';
 
 interface Route {
   path: string;
