@@ -4,7 +4,7 @@ const path = require('path');
 const webpack = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const { jsonBeautify } = require('beautify-json');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 let config = {
   output: {
@@ -13,7 +13,7 @@ let config = {
     filename: 'bundle.js',
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.tsx', '.ts', '.js', '.jsx', '.css', '.json', '.less'],
     modules: [path.join(__dirname, 'src'), 'node_modules'],
     alias: {
       react: path.join(__dirname, 'node_modules', 'react'),
@@ -22,25 +22,58 @@ let config = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.tsx?$/i,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-        },
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+            },
+          },
+          {
+            loader: 'eslint-loader',
+            options: {
+              cache: true,
+              configFile: '.eslintrc.json',
+            },
+          },
+        ],
       },
       {
-        test: /\.css$/,
+        test: /\.css$/i,
         use: [
           {
             loader: 'style-loader',
           },
           {
             loader: 'css-loader',
+            options: {
+              url: true,
+              import: true,
+              sourceMap: true,
+              importLoaders: 1,
+              modules: {
+                mode: (resourcePath) => {
+                  if (/.global.css$/i.test(resourcePath)) {
+                    return 'global';
+                  }
+                  if (/node_modules/i.test(resourcePath)) {
+                    return 'global';
+                  }
+
+                  return 'local';
+                },
+                exportGlobals: true,
+                localIdentName: '[sha512:hash:base64:5]',
+              },
+            },
           },
         ],
       },
+
       {
-        test: /\.less$/,
+        test: /\.less$/i,
         use: [
           {
             loader: 'style-loader',
@@ -50,16 +83,53 @@ let config = {
           },
           {
             loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true, //TODO: Documentation states this option as deprecated, use @plugin
+              },
+            },
           },
         ],
       },
+
+      // Matching rules for images
       {
-        test: /\.svg$/,
-        use: ['@svgr/webpack'],
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[sha512:hash:base64:5].[ext][query]',
+              outputPath: 'images',
+            },
+          },
+        ],
+      },
+
+      // Matching rules for fonts
+      {
+        test: /\.(woff|woff2|eot|ttf)$/i,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[sha512:hash:base64:5].[ext][query]',
+              outputPath: 'fonts',
+            },
+          },
+        ],
       },
     ],
   },
   plugins: [
+    new ForkTsCheckerWebpackPlugin({
+      async: false,
+      typescript: {
+        configFile: 'tsconfig.json',
+      },
+    }),
     new HtmlWebPackPlugin({
       template: './index.html',
       favicon: './favicon.png',
@@ -92,21 +162,14 @@ module.exports = (env, argv) => {
       runtimeChunk: {
         name: 'manifest',
       },
-      splitChunks: {
-        cacheGroups: {
-          vendors: {
-            test: /node_modules\/(?!antd\/).*/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-          // This can be your own design library.
-          antd: {
-            test: /node_modules\/(antd\/).*/,
-            name: 'antd',
-            chunks: 'all',
-          },
-        },
-      },
+      // splitChunks: {
+      //   cacheGroups: {
+      //     vendors: {
+      //     },
+      //     // This can be your own design library.
+
+      //   },
+      // },
     };
     config.plugins.push(
       new BundleAnalyzerPlugin({
@@ -116,10 +179,8 @@ module.exports = (env, argv) => {
         test: /\.js(\?.*)?$/i,
       }),
       new CopyPlugin({
-        patterns: [
-          { from: './_redirects' },
-        ],
-      })
+        patterns: [{ from: './_redirects' }],
+      }),
     );
     config.performance = {
       hints: 'warning',
@@ -131,8 +192,6 @@ module.exports = (env, argv) => {
   }
 
   console.log('Webpack config\n');
-
-  jsonBeautify(config);
 
   return config;
 };

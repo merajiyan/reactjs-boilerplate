@@ -1,4 +1,5 @@
 node_modules
 build
+/src/style/fonts
 .DS_Store
 .vscode
