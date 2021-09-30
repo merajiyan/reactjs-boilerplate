@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 
 const packageJson = require('../package.json');
 
-const scripts = `"start": "webpack-dev-server --port 8080 --open --mode=development --display-error-details",
+const scripts = `"start": "webpack-dev-server --port 8080 --open --hot --mode=development --display-error-details",
     "clean-build": "shx rm -rf build",
     "build": "npm run clean-build && webpack --mode=production",
     "build-serve": "npm run build && serve"`;
@@ -58,7 +58,7 @@ exec(
       '.prettierrc',
       'index.html',
       'serve.json',
-      'favicon.png'
+      'favicon.png',
     ];
 
     for (let i = 0; i < filesToCopy.length; i += 1) {

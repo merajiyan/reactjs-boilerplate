@@ -140,14 +140,18 @@ let config = {
 module.exports = (env, argv) => {
   config.mode = argv.mode;
   if (argv.mode === 'development') {
-    config.entry = ['react-hot-loader/patch', './src'];
+    config.entry = ['./src'];
     config.devtool = 'inline-source-map';
-    config.resolve.alias['react-dom'] = '@hot-loader/react-dom';
     config.plugins.push(new webpack.HotModuleReplacementPlugin());
     config.devServer = {
       compress: true,
       hot: true,
+      open: true,
       contentBase: './build',
+      overlay: {
+        errors: true,
+        warnings: false,
+      },
       historyApiFallback: true, //For react router
     };
   }
@@ -162,14 +166,6 @@ module.exports = (env, argv) => {
       runtimeChunk: {
         name: 'manifest',
       },
-      // splitChunks: {
-      //   cacheGroups: {
-      //     vendors: {
-      //     },
-      //     // This can be your own design library.
-
-      //   },
-      // },
     };
     config.plugins.push(
       new BundleAnalyzerPlugin({
